@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>欢迎登录</title>
+<link rel="stylesheet" type="text/css" href="login.css">
+</head>
+<body >
+
+  <div align="center" class="box">
+    <script type="text/javascript">
+        function reset(){
+            document.getElementById("userName").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("error").innerHTML = "";
+        }
+        function login(){
+            document.getElementById('form').submit();
+        }
+    </script>
+    <form id="form"method="post" action="servlet/LoginServlet">
+        userName:<input type="text" value="${userName }" name="userName" id="userName"/><p/>
+        password:<input type="password" value="${password }" name="password" id="password"/><br/>
+        <p/>
+    </form>
+    <a class="btn_style" id="btn_login"href="javascript:login()" >登陆</a>
+    <a class="btn_style" id="btn_reset"href="javascript:reset()">重置</a>
+    <br/>
+    <font id="error"color="red">${error}</font>
+  </div>
+  </body>
+
+</html>
