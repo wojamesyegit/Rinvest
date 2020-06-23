@@ -1,0 +1,37 @@
+@charset "UTF-8";
+<style type="text/css">
+        .box{
+            width: 400px;
+            height: 300px;
+            margin:200 auto;
+            display:block;
+            position: relative;
+        }
+
+        .btn_style{
+            width: 100px;
+            height: 30px;
+            display: block;
+            position:absolute;
+
+            text-decoration:none;
+            text-align:center;
+            line-height:30px;
+
+            color: #fff;
+            background-color: #058;
+
+        }
+        #btn_reset:HOVER {
+            background-color: #047;
+        }
+        #btn_login:hover{
+            background-color: #047;
+        }
+        #btn_reset{
+            right:50px;
+        }
+        #btn_login{
+            margin-left: 50px;
+        }
+    </style>

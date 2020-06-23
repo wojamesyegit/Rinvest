@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1, user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="#B4E6FB"> 
+		<title>行情</title>  
+	</head>
+<style type="text/css">   
+	body{margin: 0;padding: 0;} 
+	.Kline-div{
+		position: fixed;width: 100%;
+		bottom: 0rem;top: 0; 
+	}
+	.Kline-div .m-line{height: 49%;width: 100%;margin-bottom: 1%;} 
+	.Kline-div .K-line{height: 50%;width: 100%;}   
+</style>  
+	<body> 
+		<div id="Kline-div" class="Kline-div">  
+				<div id="m-line" class="m-line"></div>
+				<div id="k-content" class="K-line"></div> 
+		</div> 
+		<script src="js/jquery-3.3.1.min.js"></script> 
+		<script src="js/echarts.min.js" type="text/javascript" charset="utf-8"></script>   
+		<script src="js/tmpData.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/k-line.js" type="text/javascript" charset="utf-8"></script>
+		<script>   
+		
+		        var kChart = echarts.init(document.getElementById('k-content')); 
+		        kChart.setOption(initKOption(kdata)); 
+		        
+		        var mdata = {"data": "",
+		        		     "yestclose":"" };
+				console.log(mdata)
+				
+				function test(data){
+					var mChart = echarts.init(document.getElementById('m-line'));
+					mChart.setOption(initMOption(mdata,'hs'));
+					console.log(mdata)
+				};
+				function close(info){
+					
+					console.log(info[2]);
+					mdata.yestclose = info[2];
+				};
+				function getInfo(callback){ //获取股票信息
+					  $.ajax({
+					    url: "http://hq.sinajs.cn/list=sh000001",
+					    dataType: "script",
+					    cache: "false",
+					    type: "GET",
+					    success: function(){
+					    // 结果用 hq_str_sz000001 接收。需要对应请求的股票代码
+					      var info = hq_str_sh000001;
+					      var _info_arr = info.split(",")
+					      callback(_info_arr)
+					    },
+					    error: function(){
+					      alert("查询信息失败")
+					    }
+					  })
+				}
+				
+				function getmData(callback) { //分时图
+					$.ajax({
+					    url: "http://data.gtimg.cn/flashdata/hushen/minute/sh000001.js?maxage=110&0.28163905744440854",
+					    dataType:"script",
+					    cache:"false",
+					    type:"GET",
+					    success: function () {
+					     //结果用min_data接收
+					      var msg = min_data;
+					      var result = msg.replace(/\n/g,",").split(',')
+					      var arr = result.slice(2,result.length-1), //开头结尾各一个空数组要去掉
+					      _arr = [];
+					      var count = 0;
+					      for(var i=0;i<arr.length;i++){ 
+					        var _a = arr[i].split(" ") , _b = arr[i].split(" "), _c =[],_d = [];
+					        if(i>0){
+					          _c = arr[i-1].split(" ");
+					        }
+					        // 腾讯股票接口传的数值0930（日期） 5.55（成交价） 37673（累计成交量，初始成交量为9:30的）
+					        // 因此每分钟的 成交量 = 当前累计成交量 - 前一分钟的累计成交量
+					        var sum = (count += Number(_a[1]))/(i+1);
+					        _d[2] = sum.toFixed(3)
+		                   
+					        //_d[2] = ( Number(_b[1])+ Number(_c[1]))/2;
+					        if (_c.length == 0){
+					        	_b[2] =  _a[2] - 0;
+					        	 _d[2] = _b[1];
+					        }
+					        _b[2] = _c.length>0 ? _a[2] - _c[2] : _a[2];
+					        _d[0] = _b[0];    _d[1] = _b[1];      _d[3] = _b[2]; 
+					        _arr.push(_d)
+					      }
+					      mdata.data = _arr
+					      //console.log(mdata.data)
+					      callback(mdata)
+					    },
+					    error: function () {
+					      alert("wrong"); 
+					    }
+					  });
+				  }
+			      
+			      getInfo(close);
+			      getmData(test);
+			      
+		</script>
+	</body>
+</html>
